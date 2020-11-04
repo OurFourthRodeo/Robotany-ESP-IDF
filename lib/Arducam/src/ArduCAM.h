@@ -76,6 +76,8 @@
 #include "application.h"
 #else
 #include <cstdio>
+#include "esp_system.h"
+#include "spi.h"
 typedef unsigned char byte;
 #define regtype volatile uint8_t
 #define regsize uint8_t
