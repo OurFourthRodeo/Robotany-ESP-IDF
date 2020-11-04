@@ -1,7 +1,7 @@
-#include <camerabytes.h>
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <camerabytes.h>
 
 void app_main() {
 	int i = 0;
