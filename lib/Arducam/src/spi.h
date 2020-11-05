@@ -6,19 +6,34 @@
 // SPI Class
     // transfer(byte) -- returns response?
 
-// pinMode(Port, in/out)
-// digitalPinToBitMask(Pin)
-// portOutputRegister(Port)
-// digitalPinToPort(Pin)
+#define digitalPinToBitMask(pin)    (1UL << (((pin)>31)?((pin)-32):(pin)))
+#define portOutputRegister(port)    ((volatile uint32_t*)((port)?GPIO_OUT1_REG:GPIO_OUT_REG))
+#define digitalPinToPort(pin)       (((pin)>31)?1:0)
 
-// Wire Class
-    // beginTransmission
-    // write
+#define pgm_read_word(addr) ({ \
+  typeof(addr) _addr = (addr); \
+  *(const unsigned short *)(_addr); \
+})
+
+class SPIClass {
+private: 
+public:
+    // set pin to input or output
+    void pinMode(uint8_t pin, uint8_t mode);
+
+};
+
+class WireClass {
+    uint8_t beginTransmission(int address);
+    size_t write(uint8_t data);
     // endTransmission
 
-// delay(x)
-    // something like: vTaskDelay(x / portTICK_PERIOD_MS);
+};
 
-// pgm_read_word
+
+void delay(uint32_t ms) {
+    
+    //vTaskDelay(ms / portTICK_PERIOD_MS);
+}
 
 #endif
