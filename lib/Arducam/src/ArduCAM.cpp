@@ -80,14 +80,6 @@
 #define Wire Wire1
 #endif 
 
-#define _BV(bit) (1 << (bit))
-#define _SFR_MEM_ADDR(sfr) ((uint16_t) &(sfr))
-#define _SFR_ADDR(sfr) _SFR_MEM_ADDR(sfr)
-#define _MMIO_BYTE(mem_addr) (*(volatile uint8_t *)(mem_addr))
-#define _SFR_BYTE(sfr) _MMIO_BYTE(_SFR_ADDR(sfr))
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-
 
 int ArduCAM::bus_write(int address, int value) {
   // take the SS pin low to select the chip:
