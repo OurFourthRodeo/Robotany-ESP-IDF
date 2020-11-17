@@ -217,6 +217,8 @@ typedef unsigned char byte;
 #define SENSOR_VAL_TERM_8BIT                0xFF
 #define SENSOR_VAL_TERM_16BIT               0xFFFF
 
+#define MAX_FIFO_SIZE		0x5FFFF			//384KByte
+
 /****************************************************/
 /* ArduChip related definition 											*/
 /****************************************************/
@@ -252,6 +254,11 @@ typedef unsigned char byte;
 #define SHUTTER_MASK       		0x02
 #define CAP_DONE_MASK      		0x08
 
+#define FIFO_SIZE1				0x42  //Camera write FIFO size[7:0] for burst to read
+#define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
+#define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
+
+
 
 
 
@@ -277,6 +284,9 @@ class ArduCAM
 		void start_capture(void);
 		void clear_fifo_flag(void);
 		uint8_t read_fifo(void);
+
+		uint32_t read_fifo_length(void);
+		void set_fifo_burst(void);
 		
 		uint8_t read_reg(uint8_t addr);
 		void write_reg(uint8_t addr, uint8_t data);	
