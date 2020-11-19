@@ -2,7 +2,24 @@
  * Init camera and take a photo.
 */
 
-#include "../lib/Arducam/src/ArduCam.h"
+#include <driver/gpio.h>
+#include "driver/spi_master.h"
+
+#define CAM_MISO_PIN GPIO_NUM_19
+#define CAM_MOSI_PIN GPIO_NUM_23
+#define CAM_SCK_PIN GPIO_NUM_18
+#define CAM_SDA_PIN GPIO_NUM_21
+#define CAM_SCL_PIN GPIO_NUM_22
+#define CAM_CS_PIN GPIO_NUM_17
+
+spi_bus_config_t connection = {
+    .miso_io_num = CAM_MISO_PIN,
+    .mosi_io_num = CAM_MOSI_PIN,
+    .sclk_io_num = CAM_SCK_PIN,
+    .quadwp_io_num=-1,
+    .quadhd_io_num=-1,
+    .max_transfer_sz=1
+};
 
 // chip select = gpio17
 const int CS = 17;
@@ -19,7 +36,8 @@ int i = 0;
 bool is_header = false;
 
 // specify our camera
-ArduCAM cam(OV2640, CS);
+// we're using C, so won't be using the class
+// (it's also not super helpful with only one camera)
 
 void setup() {
     uint8_t vid, pid, temp;
