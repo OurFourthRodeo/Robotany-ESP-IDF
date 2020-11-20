@@ -4,12 +4,21 @@
 
 #include <driver/gpio.h>
 #include "driver/spi_master.h"
+#include "driver/gpio.h"
+#include "ArduCAM.h"
 
+// SPI MISO = GPIO 19
 #define CAM_MISO_PIN GPIO_NUM_19
+// SPI MOSI = GPIO 23
 #define CAM_MOSI_PIN GPIO_NUM_23
+// SPI clock = GPIO 18
 #define CAM_SCK_PIN GPIO_NUM_18
+
+// I2C data = GPIO 21
 #define CAM_SDA_PIN GPIO_NUM_21
+// I2C clock = GPIO 22
 #define CAM_SCL_PIN GPIO_NUM_22
+// chip select = GPIO 17
 #define CAM_CS_PIN GPIO_NUM_17
 
 spi_bus_config_t connection = {
@@ -21,8 +30,8 @@ spi_bus_config_t connection = {
     .max_transfer_sz=1
 };
 
-// chip select = gpio17
-const int CS = 17;
+// Configure for I2C
+
 
 // OV2640-specific macros (may want to export to regs.h)
 #define OV2640_CHIPID_HIGH  0x0A
@@ -39,7 +48,27 @@ bool is_header = false;
 // we're using C, so won't be using the class
 // (it's also not super helpful with only one camera)
 
-void setup() {
+void write_reg(uint8_t addr, uint8_t data){
+
+}
+
+uint8_t read_reg(uint8_t addr){
+
+    return 0x00;
+}
+
+void write_sensor_reg(uint8_t addr, uint8_t data){
+
+}
+
+uint8_t read_sensor_reg(uint8_t addr){
+    
+    return 0x00;
+}
+
+
+
+void setup_camera() {
     uint8_t vid, pid, temp;
 
     // TODO: set the CS as an output, turn camera on
@@ -47,8 +76,8 @@ void setup() {
     // TODO: initialize SPI
 
     // check if camera is attached (twice?)
-    cam.write_reg(ARDUCHIP_TEST1, 0x55);
-    temp = cam.read_reg(ARDUCHIP_TEST1);
+    write_reg(ARDUCHIP_TEST1, 0x55);
+    temp = read_reg(ARDUCHIP_TEST1);
     if (temp != 0x55)
     {
         // TODO: print error to serial
@@ -57,9 +86,9 @@ void setup() {
     }
 
     // ensure the camera module is OV2640
-    cam.wrSensorReg8_8(0xff, 0x01);
-    cam.rdSensorReg8_8(OV2640_CHIPID_HIGH, &vid);
-    cam.rdSensorReg8_8(OV2640_CHIPID_LOW, &pid);
+    wrSensorReg8_8(0xff, 0x01);
+    rdSensorReg8_8(OV2640_CHIPID_HIGH, &vid);
+    rdSensorReg8_8(OV2640_CHIPID_LOW, &pid);
     if ((vid != 0x26) && ((pid != 0x41) || (pid != 0x42))) 
         ; // TODO: print to serial "can't find module"
     else 
