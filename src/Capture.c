@@ -37,10 +37,6 @@ uint8_t temp = 0, temp_last = 0;
 int i = 0;
 bool is_header = false;
 
-// specify our camera
-// we're using C, so won't be using the class
-// (it's also not super helpful with only one camera)
-
 // Write single byte to register (SPI bus)
 // Same as bus_write()
 void bus_write(uint8_t addr, uint8_t data){
@@ -96,13 +92,21 @@ void start_capture() {
     write_reg(ARDUCHIP_FIFO, FIFO_START_MASK);
 }
 
-int read_fifo_length(){
+int read_fifo_length() {
     uint32_t len1,len2,len3,length=0;
-	len1 = read_reg(FIFO_SIZE1);
-	len2 = read_reg(FIFO_SIZE2);
-	len3 = read_reg(FIFO_SIZE3) & 0x7f;
-	length = ((len3 << 16) | (len2 << 8) | len1) & 0x07fffff;
-	return length;	
+    len1 = read_reg(FIFO_SIZE1);
+    len2 = read_reg(FIFO_SIZE2);
+    len3 = read_reg(FIFO_SIZE3) & 0x7f;
+    length = ((len3 << 16) | (len2 << 8) | len1) & 0x07fffff;
+    return length;	
+}
+
+void set_fifo_burst() {
+    // spi transfer 0x3c
+}
+
+void set_cs(int level) {
+    gpio_set_level((1ULL<<CAM_CS_PIN), level);
 }
 
 void OV2640_set_JPEG_size(){
@@ -125,7 +129,6 @@ void init_cam_regs(void) {
     }
 }
 
-
 void setup_camera(int format) {
     uint8_t vid, pid, temp;
     esp_err_t ret;
@@ -134,7 +137,7 @@ void setup_camera(int format) {
     gpio_config_t cs_conf = {
         .intr_type = GPIO_INTR_DISABLE,
         .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = ((1ULL<<GPIO_NUM_17)),
+        .pin_bit_mask = ((1ULL<<CAM_CS_PIN)),
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
         .pull_up_en = GPIO_PULLUP_DISABLE,
     };
@@ -184,9 +187,8 @@ void capture_task() {
     if (len == 0)
         ; // TODO: print size 0 to serial
     
-    gpio_set_level((1ULL<<GPIO_NUM_17),0);
-    
-    // TODO: set fifo burst (SPI transfer 0x3c)
+    set_cs(0);
+    set_fifo_burst();
 
     i = 0;
     while (len--)
@@ -225,4 +227,3 @@ void capture_task() {
         }
     }
 }
-
