@@ -1,61 +1,4 @@
-#ifndef CAMERABYTES_H
-#define CAMERABYTES_H
-
-// SPI MISO = GPIO 19
-#define CAM_MISO_PIN GPIO_NUM_19
-// SPI MOSI = GPIO 23
-#define CAM_MOSI_PIN GPIO_NUM_23
-// SPI clock = GPIO 18
-#define CAM_SCK_PIN GPIO_NUM_18
-
-// I2C data = GPIO 21
-#define CAM_SDA_PIN GPIO_NUM_21
-// I2C clock = GPIO 22
-#define CAM_SCL_PIN GPIO_NUM_22
-// chip select = GPIO 17
-#define CAM_CS_PIN GPIO_NUM_17
-
-// camera power on 
-#define CAM_POWER_ON D10
-// I2C Frequency
-#define I2C_MASTER_FREQ 100000
-
-// OV2640-specific macros (may want to export to regs.h)
-#define OV2640_CHIPID_HIGH  0x0A
-#define OV2640_CHIPID_LOW   0x0B
-#define ARDUCHIP_TEST1      0x00
-
-#define FIFO_SIZE1				0x42  //Camera write FIFO size[7:0] for burst to read
-#define FIFO_SIZE2				0x43  //Camera write FIFO size[15:8]
-#define FIFO_SIZE3				0x44  //Camera write FIFO size[18:16]
-
-#define ARDUCHIP_TEST1       	0x00  //TEST register
-#define ARDUCHIP_TEST2      	0x01  //TEST register
-
-#define BMP 	0
-#define JPEG	1
-
-#define OV2640_160x120 		0	//160x120
-#define OV2640_176x144 		1	//176x144
-#define OV2640_320x240 		2	//320x240
-#define OV2640_352x288 		3	//352x288
-#define OV2640_640x480		4	//640x480
-#define OV2640_800x600 		5	//800x600
-#define OV2640_1024x768		6	//1024x768
-#define OV2640_1280x1024	7	//1280x1024
-#define OV2640_1600x1200	8	//1600x1200
-
-#define MAX_FIFO_SIZE		0x5FFFF	//384KByte
-#define ARDUCHIP_FIFO      		0x04  //FIFO and I2C control
-#define FIFO_CLEAR_MASK    		0x01
-#define FIFO_START_MASK    		0x02
-#define FIFO_RDPTR_RST_MASK     0x10
-#define FIFO_WRPTR_RST_MASK     0x20
-
-struct sensor_reg {
-	uint16_t reg;
-	uint16_t val;
-};
+#include "CameraBytes.h"
 
 const struct sensor_reg OV2640_QVGA[] =
 {
@@ -78,7 +21,6 @@ const struct sensor_reg OV2640_QVGA[] =
 	{0x16, 0x10}, 
 	{0x39, 0x2}, 
 	{0x35, 0x88}, 
-
 	{0x22, 0xa}, 
 	{0x37, 0x40}, 
 	{0x23, 0x0}, 
@@ -162,7 +104,6 @@ const struct sensor_reg OV2640_QVGA[] =
 	{0x91, 0xe8}, 
 	{0x91, 0x20}, 
 	{0x92, 0x0}, 
-
 	{0x93, 0x6}, 
 	{0x93, 0xe3}, 
 	{0x93, 0x3}, 
@@ -231,7 +172,6 @@ const struct sensor_reg OV2640_QVGA[] =
 	{0xe1, 0x77}, 
 	{0xdd, 0x7f}, 
 	{0xc2, 0xe}, 
-	
 	{0xff, 0x0}, 
 	{0xe0, 0x4}, 
 	{0xc0, 0xc8}, 
@@ -243,24 +183,18 @@ const struct sensor_reg OV2640_QVGA[] =
 	{0x54, 0x0}, 
 	{0x55, 0x88}, 
 	{0x57, 0x0}, 
-	
 	{0x50, 0x92}, 
 	{0x5a, 0x50}, 
 	{0x5b, 0x3c}, 
 	{0x5c, 0x0}, 
 	{0xd3, 0x4}, 
 	{0xe0, 0x0}, 
-	
 	{0xff, 0x0}, 
 	{0x5, 0x0}, 
-	
 	{0xda, 0x8}, 
 	{0xd7, 0x3}, 
 	{0xe0, 0x0}, 
-	
 	{0x5, 0x0}, 
-
-	
 	{0xff,0xff},
 };
 
@@ -530,5 +464,3 @@ const struct sensor_reg OV2640_320x240_JPEG[] =
   { 0xe0, 0x00 },
   { 0xff, 0xff },
 };
-
-#endif
