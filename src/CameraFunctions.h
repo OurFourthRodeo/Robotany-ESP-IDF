@@ -80,7 +80,7 @@ void start_capture();
 int read_fifo_length();
 void set_fifo_burst();
 uint8_t get_bit(uint8_t addr, uint8_t bit);
-void image_read(uint32_t fifoLength, uint8_t* rxBuf);
+void image_read(uint32_t fifoLength, uint8_t** rxBuf, uint32_t* rxLen);
 
 // I2C Base Operations
 void write_sensor_reg(uint8_t addr, uint8_t data);
