@@ -9,12 +9,14 @@
 #include "esp_log.h"
 #include "CameraFunctions.h"
 #include "nvs_flash.h"
+#include "esp_tls.h"
+#include "esp_http_client.h"
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#define WIFI_SSID ""
-#define WIFI_PASS ""
+#define WIFI_SSID "IceCream"
+#define WIFI_PASS "ThisIsALongPassword1Yay1"
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
@@ -28,6 +30,45 @@ static EventGroupHandle_t s_wifi_event_group;
 static const char *TAG = "wifi station";
 
 static int s_retry_num = 0;
+
+esp_err_t _http_event_handler(esp_http_client_event_t *evt)
+{
+    switch(evt->event_id) {
+        case HTTP_EVENT_ERROR:
+            ESP_LOGD(TAG, "HTTP_EVENT_ERROR");
+            break;
+        case HTTP_EVENT_ON_CONNECTED:
+            ESP_LOGD(TAG, "HTTP_EVENT_ON_CONNECTED");
+            break;
+        case HTTP_EVENT_HEADER_SENT:
+            ESP_LOGD(TAG, "HTTP_EVENT_HEADER_SENT");
+            break;
+        case HTTP_EVENT_ON_HEADER:
+            ESP_LOGD(TAG, "HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
+            break;
+        case HTTP_EVENT_ON_DATA:
+            ESP_LOGD(TAG, "HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
+            if (!esp_http_client_is_chunked_response(evt->client)) {
+                // Write out data
+                // printf("%.*s", evt->data_len, (char*)evt->data);
+            }
+
+            break;
+        case HTTP_EVENT_ON_FINISH:
+            ESP_LOGD(TAG, "HTTP_EVENT_ON_FINISH");
+            break;
+        case HTTP_EVENT_DISCONNECTED:
+            ESP_LOGI(TAG, "HTTP_EVENT_DISCONNECTED");
+            int mbedtls_err = 0;
+            esp_err_t err = esp_tls_get_and_clear_last_error(evt->data, &mbedtls_err, NULL);
+            if (err != 0) {
+                ESP_LOGI(TAG, "Last esp error code: 0x%x", err);
+                ESP_LOGI(TAG, "Last mbedtls failure: 0x%x", mbedtls_err);
+            }
+            break;
+    }
+    return ESP_OK;
+}
 
 static void event_handler(void* arg, esp_event_base_t event_base,
 							int32_t event_id, void* event_data)
@@ -111,6 +152,39 @@ void wifi_init_as_station(){
     vEventGroupDelete(s_wifi_event_group);
 }
 
+void upload_image(uint8_t *buffer, uint32_t length){
+	esp_err_t err;
+	uint32_t lengthWithMac = length+6;
+	uint8_t *macAndCheese = malloc(lengthWithMac);
+	memset((void*)macAndCheese, 0, lengthWithMac);
+	err = esp_efuse_mac_get_default(macAndCheese);
+	printf("MAC Address: ");
+	for(int i = 0; i < 6; i++){
+		printf("%02x", macAndCheese[i]);
+	}
+	printf("\n");
+	memcpy((void*)macAndCheese+6, (void*)buffer, length);
+	esp_http_client_config_t config = {
+		.url = "https://robotany.queueunderflow.com/uploadTest",
+		.event_handler = _http_event_handler,
+		.method = HTTP_METHOD_POST,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+	//printf("Buffer length known: %d, Buffer length calculated: %d\n", lengthWithMac, strlen((const char*) buffer));
+	esp_http_client_set_post_field(client, (const char*)macAndCheese, lengthWithMac);
+	esp_http_client_set_header(client, "Content-Type", "application/octet-stream");
+	err = esp_http_client_perform(client);
+	if (err == ESP_OK) {
+		ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+				esp_http_client_get_status_code(client),
+				esp_http_client_get_content_length(client));
+	} else {
+		ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(err));
+	}
+	esp_http_client_cleanup(client);
+	free(macAndCheese);
+}
+
 void capture_image(uint8_t **buffer){
 	start_capture();
 	// TODO: Read the done flag.
@@ -135,6 +209,7 @@ void capture_image(uint8_t **buffer){
 	}
 	printf("\n");
 	
+	//upload_image(*buffer, bufferLength);
 	return;
 }
 
