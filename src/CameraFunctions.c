@@ -63,7 +63,7 @@ esp_err_t cam_init(){
 	// change capture mode to JPEG and initialize
 	init_cam_regs(JPEG);
 	
-	OV2640_set_JPEG_size(OV2640_320x240);
+	OV2640_set_JPEG_size(OV2640_1280x1024_JPEG);
 	
 	// clear FIFO flag
 	clear_fifo_flag();
@@ -256,7 +256,7 @@ void init_cam_regs(int format) {
 		write_many_sensor_regs(OV2640_JPEG);
 		write_sensor_reg(0xff, 0x01);
 		write_sensor_reg(0x15, 0x00);
-		write_many_sensor_regs(OV2640_320x240_JPEG);
+		write_many_sensor_regs(OV2640_640x480_JPEG);
 	} else {
 		write_many_sensor_regs(OV2640_QVGA);
 	}
