@@ -188,6 +188,7 @@ void capture_image(uint8_t **buffer){
 	image_read(fifo_length, buffer, &bufferLength);
 	
 	upload_image(*buffer, bufferLength);
+
 	upload_moisture();
 	return;
 }
@@ -298,7 +299,6 @@ void app_main() {
     gpio_set_level(GPIO_NUM_33, 1);
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(ADC1_GPIO32_CHANNEL, ADC_ATTEN_DB_0);
-	
 
 	while (1) {
 		printf("[%d] Captured!\n", i);
@@ -306,6 +306,7 @@ void app_main() {
 		uint8_t *rxBuf;
 		capture_image(&rxBuf);
 		free(rxBuf);
+        printf("Sleeping...\n");
 		vTaskDelay((60*60*1000) / portTICK_PERIOD_MS);
 	}
 }

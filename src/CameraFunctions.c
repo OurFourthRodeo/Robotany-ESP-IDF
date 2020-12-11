@@ -138,6 +138,9 @@ void image_read(uint32_t fifoLength, uint8_t **rxBuf, uint32_t *rxLen){
 	*rxBuf = (uint8_t*) malloc(length);
 	memcpy((void*)(*rxBuf), (void*)tempBuf, length);
 	*rxLen = length;
+	// for(int i = 0; i < length; i++){
+    //     printf("%02X",(tempBuf)[i]);
+    // }
 	//printf("Freeing tx and temp buffers...\n");
 	free(txBuf);
 	free(tempBuf);
